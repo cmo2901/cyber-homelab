@@ -5,11 +5,12 @@
 <p> Following the configuration of the virtual network and all necessary virtual machines, I used a Kali Linux machine to simulate a cyberattack, going through the stages of Reconaissance, Initial Access, Lateral Movement and Privilege Escalation, and Data Exfiltration and Persistence.</p>
 
 ## Tools Used
+<p> Virtualbox</p>
 <p> Active Directory</p>
 <p> Wazuh</p>
 <p> Mailhog</p>
 <p> Linux (Ubuntu, Kali)</p>
-<p> Hydra, NMap, Secure Copy</p>
+<p> Hydra, NMap, Secure Copy, netexec, Evil-WinRM</p>
 
 ## Reconaissance and Initial Access
 <p> To start off my cyberattack, I needed to gather basic information about systems and services on the target network. I achieved this via an Nmap scan of one of the servers on the network, and found it to be running SMTP as well as SSH over port 22.</p>
@@ -32,6 +33,36 @@
 <p>Phished credentials:</p>
 
 ![phished_corp_credentials](https://github.com/user-attachments/assets/e6b41e47-5f20-400c-a220-f022c4b933fe)
+
+<p> With these compromised credentials I achieved initial access to a corporate machine:</p>
+
+![initial_access_corp_machine](https://github.com/user-attachments/assets/d4e0d33a-e39b-4905-a01f-a5c1ef91a3f2)
+
+
+## Lateral Movement and Privilege Escalation
+<p>With access to a corporate machine, I needed to figure out how to move throughout the network and gain elevated privileges. I discovered through an Nmap scan of the 10.0.2.100 client that ports 5985 and 5986 (WinRM) were open:</p>
+
+![nmap_scan_for_open_winrm](https://github.com/user-attachments/assets/1b646959-a928-4137-9470-04346880ed39)
+
+<p>To see if I could leverage WinRM being open, I used netexec to test credentials against the 10.0.2.100 client:</p>
+
+![testing_creds_win_machine_with_netexec](https://github.com/user-attachments/assets/4a6c2852-9bac-41ce-b9e3-332493394077)
+
+<p>Since these credentials appeared to work, I utilized Evil-WinRM to access 10.0.2.100:</p>
+
+![accessing_win_client_evil-winrm](https://github.com/user-attachments/assets/aa409c17-6905-48b4-b2d9-8d3e2cf1cca8)
+
+<p>From here, I gathered information about this machine's domain controller as well as ran an Nmap scan of the domain controller's IP to see what services were open:</p>
+
+![gathering_dc_information](https://github.com/user-attachments/assets/de67b015-53a1-416f-879c-5fccdbbc7d3c)
+
+
+![nmap_scan_dc_open_rdp](https://github.com/user-attachments/assets/7f8a82cc-bc2e-4101-a2fc-05f8d3dce952)
+
+<p>With access to administrator credentials and knowledge of the domain controller's address and open RDP, I attempted an RDP connection from my Kali machine:</p>
+
+
+![domain_controller_compromised](https://github.com/user-attachments/assets/f4365b04-0120-4ca2-8cdb-814eb859c66f)
 
 
 
